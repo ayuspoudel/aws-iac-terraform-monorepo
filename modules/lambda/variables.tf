@@ -33,10 +33,10 @@ variable "function_handler" {
   type        = string
 }
 
-variable "function_source_path" {
-  description = "Path to the zipped Lambda deployment package."
-  type        = string
-}
+# variable "function_source_path" {
+#   description = "Path to the zipped Lambda deployment package."
+#   type        = string
+# }
 
 variable "tags" {
   type        = map(string)
