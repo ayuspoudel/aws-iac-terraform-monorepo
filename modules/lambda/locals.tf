@@ -1,5 +1,5 @@
 locals {
-  function_name = "${var.project}-${var.owner}-lambda"
+  function_name = "${var.project}-${var.owner}-function"
 
   reserved_tags = {
     Owner        = var.owner

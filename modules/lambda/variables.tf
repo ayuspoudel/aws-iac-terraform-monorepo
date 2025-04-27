@@ -3,6 +3,10 @@ variable "project" {
   type        = string
 }
 
+variable "function"{
+  type = string
+  description = "What does this function do?"
+}
 variable "owner" {
   description = "Owner of the infrastructure."
   type        = string
