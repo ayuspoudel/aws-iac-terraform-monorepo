@@ -45,6 +45,7 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ./environments/automated-ticketing-and-triage  # Specify the directory here
 
       - name: Terraform Plan
         run: |
@@ -59,6 +60,7 @@ jobs:
           else
             terraform plan  # Apply all resources if "all" is selected
           fi
+        working-directory: ./environments/automated-ticketing-and-triage
 
       - name: Terraform Apply
         run: |
@@ -73,6 +75,7 @@ jobs:
           else
             terraform apply -auto-approve
           fi
+        working-directory: ./environments/automated-ticketing-and-triage
 
       - name: Terraform Destroy (if destroy is selected)
         if: ${{ github.event.inputs.action == 'destroy' }}
@@ -88,3 +91,4 @@ jobs:
           else
             terraform destroy -auto-approve
           fi
+        working-directory: ./environments/automated-ticketing-and-triage
