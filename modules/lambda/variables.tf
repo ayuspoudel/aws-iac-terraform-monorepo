@@ -13,6 +13,10 @@ variable "owner" {
   default     = "ayush"
 }
 
+variable "image_uri"{
+  type = string
+}
+
 variable "resource_lifecycle" {
   description = "Lifecycle tag for the resource (temporary or longterm)"
   type        = string
