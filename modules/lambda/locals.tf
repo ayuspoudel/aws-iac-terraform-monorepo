@@ -1,11 +1,14 @@
 locals {
-  generated_table_name = "${var.project}-${var.owner}-locks"
+  function_name = "${var.project}-${var.owner}-lambda"
 
-  merged_tags = {
+  reserved_tags = {
     Owner        = var.owner
     Project      = var.project
     Terraform    = "true"
     Lifecycle    = var.resource_lifecycle
     CreatedDate  = timestamp()
+    Managed_by   = "Terraform"
   }
+
+  all_tags = merge(local.reserved_tags, var.tags)
 }

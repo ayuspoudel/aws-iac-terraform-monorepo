@@ -13,6 +13,15 @@ variable "owner"{
     type = string
 }
 
+variable "project" {
+  description = "What project is this user for?"
+  type = string
+}
+
+variable "user_type"{
+    description =  "What kind of user is this?"
+    type = string
+}
 variable "tags" {
   type        = map(string)
   description = "User-defined additional tags"
@@ -23,7 +32,9 @@ variable "tags" {
       !contains(keys(var.tags), "Environment"),
       !contains(keys(var.tags), "Team"),
       !contains(keys(var.tags), "Owner"),
-      !contains(keys(var.tags), "Managed_by")
+      !contains(keys(var.tags), "Managed_by"),
+      !contains(keys(var.tags), "Project"),
+      !contains(keys(var.tags), "User_Type")
     ])
     error_message = "You cannot override reserved tags: Environment, Team, Owner, Managed_by"
   }

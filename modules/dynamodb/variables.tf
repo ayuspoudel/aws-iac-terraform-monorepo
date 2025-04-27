@@ -1,18 +1,16 @@
 
+variable "project" {
+  description = "Project name for naming and tagging."
+  type        = string
+}
 
-resource "aws_dynamodb_table" "this" {
-  name         = local.generated_table_name
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
+variable "owner" {
+  description = "Owner of the infrastructure."
+  type        = string
+}
 
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
-
-  tags = local.merged_tags
-
-  lifecycle {
-    prevent_destroy = true
-  }
+variable "resource_lifecycle" {
+  description = "Lifecycle tag (temporary or longterm)"
+  type        = string
+  default     = "temporary"
 }
