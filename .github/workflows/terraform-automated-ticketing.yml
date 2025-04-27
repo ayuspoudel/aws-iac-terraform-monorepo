@@ -4,6 +4,27 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Choose apply or destroy'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
+      target_resource:
+        description: 'Specify the resource to target (e.g., ecr, lambda, etc.)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - ecr
+          - lambda
+          - iam
+          - s3
 
 jobs:
   terraform:
@@ -27,20 +48,43 @@ jobs:
 
       - name: Terraform Plan
         run: |
-          if [ "${{ github.event.pull_request.title }}" == "ECR" ]; then
+          if [ "${{ github.event.inputs.target_resource }}" == "ecr" ]; then
             terraform plan -target=aws_ecr_repository.lambda_repo
-          elif [ "${{ github.event.pull_request.title }}" == "Lambda" ]; then
+          elif [ "${{ github.event.inputs.target_resource }}" == "lambda" ]; then
             terraform plan -target=aws_lambda_function.this
+          elif [ "${{ github.event.inputs.target_resource }}" == "iam" ]; then
+            terraform plan -target=aws_iam_role.this
+          elif [ "${{ github.event.inputs.target_resource }}" == "s3" ]; then
+            terraform plan -target=aws_s3_bucket.this
           else
-            terraform plan
+            terraform plan  # Apply all resources if "all" is selected
           fi
 
       - name: Terraform Apply
         run: |
-          if [ "${{ github.event.pull_request.title }}" == "ECR" ]; then
+          if [ "${{ github.event.inputs.target_resource }}" == "ecr" ]; then
             terraform apply -target=aws_ecr_repository.lambda_repo -auto-approve
-          elif [ "${{ github.event.pull_request.title }}" == "Lambda" ]; then
+          elif [ "${{ github.event.inputs.target_resource }}" == "lambda" ]; then
             terraform apply -target=aws_lambda_function.this -auto-approve
+          elif [ "${{ github.event.inputs.target_resource }}" == "iam" ]; then
+            terraform apply -target=aws_iam_role.this -auto-approve
+          elif [ "${{ github.event.inputs.target_resource }}" == "s3" ]; then
+            terraform apply -target=aws_s3_bucket.this -auto-approve
           else
             terraform apply -auto-approve
+          fi
+
+      - name: Terraform Destroy (if destroy is selected)
+        if: ${{ github.event.inputs.action == 'destroy' }}
+        run: |
+          if [ "${{ github.event.inputs.target_resource }}" == "ecr" ]; then
+            terraform destroy -target=aws_ecr_repository.lambda_repo -auto-approve
+          elif [ "${{ github.event.inputs.target_resource }}" == "lambda" ]; then
+            terraform destroy -target=aws_lambda_function.this -auto-approve
+          elif [ "${{ github.event.inputs.target_resource }}" == "iam" ]; then
+            terraform destroy -target=aws_iam_role.this -auto-approve
+          elif [ "${{ github.event.inputs.target_resource }}" == "s3" ]; then
+            terraform destroy -target=aws_s3_bucket.this -auto-approve
+          else
+            terraform destroy -auto-approve
           fi
