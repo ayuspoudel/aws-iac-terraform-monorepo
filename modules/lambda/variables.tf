@@ -27,7 +27,10 @@ variable "function_runtime" {
   description = "Lambda runtime environment."
   type        = string
 }
-
+variable "package_type"{
+  description = "What are you deploying zip/s3/image"
+  type = string
+}
 variable "function_handler" {
   description = "Lambda handler function."
   type        = string
