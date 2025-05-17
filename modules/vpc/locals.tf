@@ -1,4 +1,6 @@
 locals {
+  creation_date = formatdate("YYYY-MM-DD", timestamp())
+
   # Naming
   vpc_name = "${var.project_name}-vpc-${replace(var.vpc_cidr, "/", "-")}"
   igw_name = "${var.project_name}-igw-${replace(var.vpc_cidr, "/", "-")}"
@@ -24,7 +26,7 @@ locals {
   # Tagging
   common_tags = {
     "Project-Name"  = var.project_name
-    "Creation-Date" = var.creation_date
+    "Creation-Date" = local.creation_date
     "Managed-By"    = "Terraform"
   }
 

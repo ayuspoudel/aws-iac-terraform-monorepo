@@ -3,12 +3,6 @@ variable "project_name" {
   type        = string
 }
 
-variable "creation_date" {
-  description = "Creation date for tagging"
-  type        = string
-  default     = formatdate("YYYY-MM-DD", timestamp())
-}
-
 variable "vpc_cidr" {
   description = "CIDR block for the VPC"
   type        = string
