@@ -1,8 +1,12 @@
 
+
+ 
+
 # Cloud Infrastructure as Code (IaC) Monorepo
 
 Welcome to the **Cloud IaC Monorepo** — a modular, reusable, and community-friendly Terraform codebase designed to help teams rapidly provision and manage AWS infrastructure for diverse projects.
 
+ 
 
 ## Purpose
 
@@ -10,6 +14,7 @@ This repository hosts a collection of **Terraform modules** and **environment co
 
 The goal is to provide a **clean, modular, and extensible foundation** that anyone can use, adapt, and contribute to. Whether you're building serverless applications, container platforms, or microservices architectures, this repo offers well-structured building blocks to get your infrastructure up and running quickly.
 
+ 
 
 ## Repo Structure
 
@@ -32,23 +37,40 @@ The goal is to provide a **clean, modular, and extensible foundation** that anyo
 └── README.md                  # This file
 ```
 
+ 
+
+## Prerequisites
+
+* [Terraform](https://www.terraform.io/downloads.html) version 1.4+ installed
+* AWS CLI configured with appropriate IAM permissions
+* AWS account access with rights to create networking, compute, and other resources
+
+ 
 
 ## Why This Repo?
 
 * **Modularity:** Each module is designed to be standalone and composable so you can pick and choose what you need.
 * **Project Alignment:** Environment folders are tightly coupled with actual project repos for easy traceability.
-* **Community-Oriented:** This repo is open for collaboration! If you find bugs, want new features, or improvements, please contribute.
-* **Scalability:** Designed for projects of varying sizes — from small apps to complex microservices with multiple AWS services.
+* **Community-Oriented:** Open to collaboration! If you find bugs, want new features, or improvements, please contribute.
+* **Scalability:** Supports projects of varying sizes — from small apps to complex microservices with multiple AWS services.
 * **Best Practices:** Uses Terraform best practices for backend configuration, state management, and code organization.
 
+ 
 
 ## Getting Started
 
-1. Browse the modules under `/modules` to understand available resources.
-2. Explore environment configurations in `/environments` matching your project or a similar use case.
-3. Customize inputs in environment `.tf` files to fit your needs.
-4. Run Terraform init/apply commands in the environment directories.
+1. Explore reusable modules located in the `/modules` directory to understand available resources.
+2. Choose or create your environment folder inside `/environments/<project-name>/` matching your project.
+3. Customize input variables in your environment’s `.tf` files to suit your infrastructure needs.
+4. Initialize Terraform and deploy your infrastructure:
 
+```bash
+cd environments/<project-name>/
+terraform init
+terraform apply
+```
+
+ 
 
 ## Contributing
 
@@ -58,12 +80,13 @@ Contributions are very welcome! Whether it’s:
 * Bug fixes or documentation improvements
 * Suggestions for better patterns or tooling
 
-Please open issues or submit pull requests. Make sure to follow the existing style and add documentation for your changes.
+Please open issues or submit pull requests. Follow the existing style and add documentation for your changes.
 
+ 
 
-## Suggestions / Roadmap
+## Suggestions & Roadmap
 
-I’m open to ideas on:
+Open to ideas on:
 
 * Adding more modules (RDS, CloudFront, SNS, SQS, etc.)
 * Improved CI/CD integration for module testing
@@ -72,10 +95,12 @@ I’m open to ideas on:
 
 Feel free to open discussions or reach out!
 
+ 
 
 Thank you for checking out this repo. I hope it helps you build your cloud infrastructure efficiently and reliably!
 
+**Happy Terraforming!**
 
-**Happy Terraforming!** 
+ 
 
-
+If you want, I can also help you write CONTRIBUTING.md or example environment configs next!
