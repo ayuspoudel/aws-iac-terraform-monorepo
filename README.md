@@ -4,6 +4,10 @@
 
 # Cloud Infrastructure as Code (IaC) Monorepo
 
+[![Terraform](https://img.shields.io/badge/Terraform-v1.5-blue)](https://www.terraform.io/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Issues](https://img.shields.io/github/issues/yourusername/yourrepo.svg)](https://github.com/yourusername/yourrepo/issues)
+
 Welcome to the **Cloud IaC Monorepo** — a modular, reusable, and community-friendly Terraform codebase designed to help teams rapidly provision and manage AWS infrastructure for diverse projects.
 
  
