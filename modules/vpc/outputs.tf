@@ -18,10 +18,6 @@ output "private_subnet_ids" {
   value       = aws_subnet.private[*].id
 }
 
-output "internet_gateway_id" {
-  description = "The ID of the Internet Gateway"
-  value       = var.enable_internet_gateway ? aws_internet_gateway.igw.id : null
-}
 
 output "nat_gateway_ids" {
   description = "List of NAT Gateway IDs"
@@ -30,7 +26,7 @@ output "nat_gateway_ids" {
 
 output "vpn_gateway_id" {
   description = "ID of VPN Gateway if enabled"
-  value       = var.enable_vpn_gateway ? aws_vpn_gateway.vpn_gateway.id : null
+  value       = var.enable_vpn_gateway ? (length(aws_vpn_gateway.this) > 0 ? aws_vpn_gateway.this[0].id : null) : null
 }
 
 output "route_table_public_id" {
@@ -38,9 +34,9 @@ output "route_table_public_id" {
   value       = aws_route_table.public.id
 }
 
-output "route_table_private_id" {
-  description = "Private route table ID"
-  value       = aws_route_table.private.id
+output "route_table_private_ids" {
+  description = "Private route table IDs"
+  value       = aws_route_table.private[*].id
 }
 
 output "tags" {

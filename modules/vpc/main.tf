@@ -16,10 +16,10 @@ resource "aws_internet_gateway" "this" {
 
 # Public Subnets
 resource "aws_subnet" "public" {
-  count                   = length(var.public_subnet_cidrs)
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = var.public_subnet_cidrs[count.index]
-  availability_zone       = var.availability_zones[count.index]
+  count             = length(var.public_subnet_cidrs)
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = var.public_subnet_cidrs[count.index]
+  availability_zone = var.availability_zones[count.index]
   map_public_ip_on_launch = true
 
   tags = merge(local.merged_tags, {
@@ -29,10 +29,10 @@ resource "aws_subnet" "public" {
 
 # Private Subnets
 resource "aws_subnet" "private" {
-  count                   = length(var.private_subnet_cidrs)
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = var.private_subnet_cidrs[count.index]
-  availability_zone       = var.availability_zones[count.index]
+  count             = length(var.private_subnet_cidrs)
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = var.private_subnet_cidrs[count.index]
+  availability_zone = var.availability_zones[count.index]
   map_public_ip_on_launch = false
 
   tags = merge(local.merged_tags, {
@@ -43,11 +43,11 @@ resource "aws_subnet" "private" {
 # Elastic IPs for NAT Gateways
 resource "aws_eip" "nat" {
   count = var.enable_nat_gateway ? (var.nat_gateway_per_az ? length(var.availability_zones) : 1) : 0
-  vpc   = true
+
+  domain = "vpc"   # fixed deprecated 'vpc' argument
 
   tags = merge(local.merged_tags, {
-    Name = var.nat_gateway_per_az ? format("%s-nat-gateway-%s-eip", var.project_name, count.index) : format("%s-nat-gateway-eip", var.project_name)
-
+    Name = var.nat_gateway_per_az ? format("%s-nat-gateway-%d-eip", var.project_name, count.index) : format("%s-nat-gateway-eip", var.project_name)
   })
 }
 
@@ -58,7 +58,7 @@ resource "aws_nat_gateway" "this" {
   subnet_id     = var.nat_gateway_per_az ? aws_subnet.public[count.index].id : aws_subnet.public[0].id
 
   tags = merge(local.merged_tags, {
-    Name = var.nat_gateway_per_az ? format("%s-nat-gateway-%s", var.project_name, count.index) :"${var.project_name}-nat-gateway"
+    Name = var.nat_gateway_per_az ? format("%s-nat-gateway-%d", var.project_name, count.index) : "${var.project_name}-nat-gateway"
   })
 }
 
