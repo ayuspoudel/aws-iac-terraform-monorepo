@@ -6,8 +6,14 @@
 
 [![Terraform](https://img.shields.io/badge/Terraform-v1.5-blue)](https://www.terraform.io/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Issues](https://img.shields.io/github/issues/yourusername/yourrepo.svg)](https://github.com/yourusername/yourrepo/issues)
+[![Issues](https://img.shields.io/github/issues/yourusername/yourrepo.svg)](https://github.com/ayuspoudel/cloud-iac-monorepo/issues)
 
+### Maintainers
+
+Ayush Poudel – main maintainer and contributor
+Community contributors — thank you for your support!
+
+--- 
 Welcome to the **Cloud IaC Monorepo** — a modular, reusable, and community-friendly Terraform codebase designed to help teams rapidly provision and manage AWS infrastructure for diverse projects.
 
  
