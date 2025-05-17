@@ -46,9 +46,8 @@ resource "aws_eip" "nat" {
   vpc   = true
 
   tags = merge(local.merged_tags, {
-    Name = var.nat_gateway_per_az ?
-      format("%s-nat-gateway-%s-eip", var.project_name, count.index) :
-      "${var.project_name}-nat-gateway-eip"
+    Name = var.nat_gateway_per_az ? format("%s-nat-gateway-%s-eip", var.project_name, count.index) : format("%s-nat-gateway-eip", var.project_name)
+
   })
 }
 
@@ -59,9 +58,7 @@ resource "aws_nat_gateway" "this" {
   subnet_id     = var.nat_gateway_per_az ? aws_subnet.public[count.index].id : aws_subnet.public[0].id
 
   tags = merge(local.merged_tags, {
-    Name = var.nat_gateway_per_az ?
-      format("%s-nat-gateway-%s", var.project_name, count.index) :
-      "${var.project_name}-nat-gateway"
+    Name = var.nat_gateway_per_az ? format("%s-nat-gateway-%s", var.project_name, count.index) :"${var.project_name}-nat-gateway"
   })
 }
 
