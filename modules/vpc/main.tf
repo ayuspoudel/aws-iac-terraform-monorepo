@@ -50,22 +50,35 @@ resource "aws_eip" "nat" {
   )
 }
 
+# Elastic IPs for NAT Gateways
+resource "aws_eip" "nat" {
+  count = var.enable_nat_gateway ? (var.nat_gateway_per_az ? length(var.availability_zones) : 1) : 0
+  vpc   = true
+
+  tags = merge(
+    local.merged_tags,
+    {
+      Name = var.nat_gateway_per_az ? "${var.project_name}-eip-nat-${count.index}" : "${var.project_name}-eip-nat"
+    }
+  )
+}
+
 # NAT Gateways
 resource "aws_nat_gateway" "this" {
   count         = var.enable_nat_gateway ? (var.nat_gateway_per_az ? length(var.availability_zones) : 1) : 0
   allocation_id = aws_eip.nat[count.index].id
-  subnet_id     = var.nat_gateway_per_az ?
-                  aws_subnet.public[count.index].id :
-                  aws_subnet.public[0].id
+
+  subnet_id = var.nat_gateway_per_az ? aws_subnet.public[count.index].id : aws_subnet.public[0].id
 
   tags = merge(
     local.merged_tags,
-    { Name = var.nat_gateway_per_az ?
-      local.nat_gateway_names[count.index] :
-      "${var.project_name}-nat-gateway"
+    {
+      Name = var.nat_gateway_per_az ? "${var.project_name}-nat-gateway-${count.index}" :
+        "${var.project_name}-nat-gateway"
     }
   )
 }
+
 
 # Route Tables and Associations for Public Subnets
 resource "aws_route_table" "public" {
