@@ -10,6 +10,7 @@ resource "aws_security_group" "this" {
 resource "aws_security_group_rule" "ingress" {
   for_each = { for idx, rule in var.ingress_rules : idx => rule }
   self = try(each.value.self, false)
+  depends_on = [aws_security_group.this]
   type              = "ingress"
   from_port         = local.predefined_rules[each.value.rule_key].from_port
   to_port           = local.predefined_rules[each.value.rule_key].to_port
@@ -24,7 +25,7 @@ resource "aws_security_group_rule" "ingress" {
 
 resource "aws_security_group_rule" "egress" {
   for_each = { for idx, rule in var.ingress_rules : idx => rule }
-
+  depends_on = [aws_security_group.this]
   type              = "egress"
   from_port         = local. predefined_rules[each.value.rule_key].from_port
   to_port           = local. predefined_rules[each.value.rule_key].to_port
