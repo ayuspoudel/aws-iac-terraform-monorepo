@@ -8,21 +8,22 @@ resource "aws_security_group" "this" {
 }
 
 resource "aws_security_group_rule" "ingress" {
-  for_each = toset(var.ingress_rules)
+  for_each = { for idx, rule in var.ingress_rules : idx => rule }
 
   type              = "ingress"
-  from_port         = local. predefined_rules[each.value].from_port
-  to_port           = local. predefined_rules[each.value].to_port
-  protocol          = local. predefined_rules[each.value].protocol
-  description       = local. predefined_rules[each.value].description
-  cidr_blocks       = try(local. predefined_rules[each.value].cidr_blocks, var.default_cidr_blocks)
-  ipv6_cidr_blocks  = try(local. predefined_rules[each.value].ipv6_cidr_blocks, [])
-  prefix_list_ids   = try(local. predefined_rules[each.value].prefix_list_ids, [])
+  from_port         = local.predefined_rules[each.value.rule_key].from_port
+  to_port           = local.predefined_rules[each.value.rule_key].to_port
+  protocol          = local.predefined_rules[each.value.rule_key].protocol
+  description       = each.value.description
+  cidr_blocks       = try(each.value.cidr_blocks, var.default_cidr_blocks)
+  ipv6_cidr_blocks  = try(each.value.ipv6_cidr_blocks, [])
+  prefix_list_ids   = try(each.value.prefix_list_ids, [])
   security_group_id = local.this_sg_id
 }
 
+
 resource "aws_security_group_rule" "egress" {
-  for_each = toset(var.egress_rules)
+  for_each = { for idx, rule in var.ingress_rules : idx => rule }
 
   type              = "egress"
   from_port         = local. predefined_rules[each.value].from_port
