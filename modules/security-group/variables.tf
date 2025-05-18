@@ -83,5 +83,11 @@ EOT
     ipv6_cidr_blocks = optional(list(string))
     prefix_list_ids  = optional(list(string))
   }))
-  default = []
+  validation {
+    condition = alltrue([
+      for r in var.ingress_rules :
+      can(r.rule_key) || (can(r.from_port) && can(r.to_port) && can(r.protocol))
+    ])
+    error_message = "Each rule must have either a rule_key or from_port/to_port/protocol."
+  }
 }
