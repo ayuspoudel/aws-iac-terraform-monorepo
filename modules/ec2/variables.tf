@@ -213,8 +213,8 @@ variable "tags" {
 }
 
 # Lifecycle control
-variable "lifecycle" {
-  description = "EC2 lifecycle behavior configuration"
+variable "instance_lifecycle_opts" {
+  description = "EC2 lifecycle configuration"
   type = object({
     create_before_destroy = bool
     prevent_destroy       = bool
@@ -224,6 +224,7 @@ variable "lifecycle" {
     prevent_destroy       = false
   }
 }
+
 
 variable "iam_role_name" {
   description = "Name of the IAM role to attach to the instance profile (required if create_iam_instance_profile is true)"

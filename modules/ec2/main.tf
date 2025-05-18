@@ -1,12 +1,13 @@
 # main.tf
 
+# Deploy a standalone EC2 instance (if launch_type is 'instance')
 resource "aws_instance" "this" {
   count = var.launch_type == "instance" ? 1 : 0
 
   ami                         = var.ami
   instance_type               = var.instance_type
-  subnet_id                   = var.subnet_id
-  vpc_security_group_ids      = var.security_group_ids
+  subnet_id              = var.subnet_id != null ? var.subnet_id : data.aws_subnet.default.id
+  vpc_security_group_ids = length(var.security_group_ids) > 0 ? var.security_group_ids : [data.aws_security_group.default.id]
   key_name                    = var.create_key_pair ? aws_key_pair.this[0].key_name : var.key_name
   monitoring                  = var.monitoring
   iam_instance_profile        = var.iam_instance_profile
@@ -15,32 +16,37 @@ resource "aws_instance" "this" {
   user_data                   = var.user_data
   user_data_replace_on_change = true
 
+  # Root EBS volume configuration
   root_block_device {
     volume_size = var.root_volume.size
     volume_type = var.root_volume.type
     encrypted   = true
   }
 
+  # Lifecycle rules for instance replacement and protection
   lifecycle {
-    create_before_destroy = var.lifecycle.create_before_destroy
-    prevent_destroy       = var.lifecycle.prevent_destroy
+    create_before_destroy = var.instance_lifecycle_opts.create_before_destroy
+    prevent_destroy       = var.instance_lifecycle_opts.prevent_destroy
   }
 
   tags = merge(local.default_tags, var.tags)
 }
 
+# Generate a new SSH key pair if requested
 resource "tls_private_key" "this" {
   count     = var.create_key_pair ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
+# Create AWS key pair resource using the generated public key
 resource "aws_key_pair" "this" {
   count      = var.create_key_pair ? 1 : 0
   key_name   = "${var.name}-key"
   public_key = tls_private_key.this[0].public_key_openssh
 }
 
+# Create a launch template for use with Auto Scaling Group
 resource "aws_launch_template" "this" {
   count = var.launch_type == "asg" ? 1 : 0
 
@@ -80,6 +86,7 @@ resource "aws_launch_template" "this" {
   }
 }
 
+# Auto Scaling Group configuration
 resource "aws_autoscaling_group" "this" {
   count               = var.launch_type == "asg" ? 1 : 0
   name                = "${var.name}-asg"
@@ -94,6 +101,7 @@ resource "aws_autoscaling_group" "this" {
     version = "$Latest"
   }
 
+  # Attach to ALB target group if requested
   target_group_arns = var.attach_to_alb ? [var.target_group_arn] : null
 
   tag {
@@ -103,6 +111,7 @@ resource "aws_autoscaling_group" "this" {
   }
 }
 
+# Create a spot instance request if launch_type is 'spot'
 resource "aws_spot_instance_request" "this" {
   count = var.launch_type == "spot" ? 1 : 0
 
@@ -117,18 +126,20 @@ resource "aws_spot_instance_request" "this" {
   user_data                   = var.user_data
   user_data_replace_on_change = true
 
+  # Spot-specific parameters
   spot_type                      = var.spot_config.spot_type
   wait_for_fulfillment           = var.spot_config.wait_for_fulfillment
   instance_interruption_behavior = var.spot_config.interruption_behavior
 
   lifecycle {
-    create_before_destroy = var.lifecycle.create_before_destroy
-    prevent_destroy       = var.lifecycle.prevent_destroy
+    create_before_destroy = var.instance_lifecycle_opts.create_before_destroy
+    prevent_destroy       = var.instance_lifecycle_opts.prevent_destroy
   }
 
   tags = merge(local.default_tags, var.tags)
 }
 
+# Optional data volume (EBS) provisioning
 resource "aws_ebs_volume" "data" {
   count = var.enable_data_volume ? 1 : 0
 
@@ -139,6 +150,7 @@ resource "aws_ebs_volume" "data" {
   tags              = merge(local.default_tags, var.tags)
 }
 
+# Attach data volume to instance (only in standalone EC2 mode)
 resource "aws_volume_attachment" "data" {
   count = var.enable_data_volume && var.launch_type == "instance" ? 1 : 0
 
