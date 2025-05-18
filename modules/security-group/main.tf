@@ -12,9 +12,13 @@ resource "aws_security_group_rule" "ingress" {
   self = try(each.value.self, false)
   depends_on = [aws_security_group.this]
   type              = "ingress"
-  from_port = try(each.value.from_port, local.predefined_rules[each.value.rule_key].from_port)
-  to_port   = try(each.value.to_port, local.predefined_rules[each.value.rule_key].to_port)
-  protocol  = try(each.value.protocol, local.predefined_rules[each.value.rule_key].protocol)
+  # from_port = try(each.value.from_port, local.predefined_rules[each.value.rule_key].from_port)
+  # to_port   = try(each.value.to_port, local.predefined_rules[each.value.rule_key].to_port)
+  # protocol  = try(each.value.protocol, local.predefined_rules[each.value.rule_key].protocol)
+
+  from_port = each.value.from_port
+  to_port   = each.value.to_port
+  protocol  = each.value.protocol
   description       = each.value.description
   cidr_blocks       = try(each.value.cidr_blocks, var.default_cidr_blocks)
   ipv6_cidr_blocks  = try(each.value.ipv6_cidr_blocks, [])
@@ -36,9 +40,13 @@ resource "aws_security_group_rule" "egress" {
   for_each = { for idx, rule in var.egress_rules : idx => rule }
   depends_on = [aws_security_group.this]
   type              = "egress"
-  from_port = try(each.value.from_port, local.predefined_rules[each.value.rule_key].from_port)
-  to_port   = try(each.value.to_port, local.predefined_rules[each.value.rule_key].to_port)
-  protocol  = try(each.value.protocol, local.predefined_rules[each.value.rule_key].protocol)
+  # from_port = try(each.value.from_port, local.predefined_rules[each.value.rule_key].from_port)
+  # to_port   = try(each.value.to_port, local.predefined_rules[each.value.rule_key].to_port)
+  # protocol  = try(each.value.protocol, local.predefined_rules[each.value.rule_key].protocol)
+  from_port = each.value.from_port
+  to_port   = each.value.to_port
+  protocol  = each.value.protocol
+
   description       = local. predefined_rules[each.value.rule_key].description
   cidr_blocks       = try(local. predefined_rules[each.value.rule_key].cidr_blocks, var.default_cidr_blocks)
   ipv6_cidr_blocks  = try(local. predefined_rules[each.value.rule_key].ipv6_cidr_blocks, [])
