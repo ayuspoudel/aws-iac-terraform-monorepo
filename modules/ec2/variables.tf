@@ -232,9 +232,9 @@ variable "iam_role_name" {
   default     = null
 
   validation {
-    condition = var.create_iam_instance_profile == false || (
-  var.create_iam_instance_profile == true && can(length(var.iam_role_name)) && length(var.iam_role_name) > 0
-)
-    error_message = "You must provide 'iam_role_name' if 'create_iam_instance_profile' is true."
-  }
+  condition = var.create_iam_instance_profile == false || (
+    var.create_iam_instance_profile == true && try(length(var.iam_role_name), 0) > 0
+  )
+  error_message = "You must provide 'iam_role_name' if 'create_iam_instance_profile' is true."
+}
 }
