@@ -94,3 +94,9 @@ variable "extra_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "create_transit_gateway" {
+  description = "Whether to create transit gateway or not"
+  type        = bool
+  default     = false
+}
