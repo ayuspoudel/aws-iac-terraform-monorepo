@@ -47,7 +47,7 @@ resource "aws_security_group_rule" "egress" {
   to_port   = each.value.to_port
   protocol  = each.value.protocol
 
-  description       = local. predefined_rules[each.value.rule_key].description
+  description       = each.value.description
   cidr_blocks       = try(local. predefined_rules[each.value.rule_key].cidr_blocks, var.default_cidr_blocks)
   ipv6_cidr_blocks  = try(local. predefined_rules[each.value.rule_key].ipv6_cidr_blocks, [])
   prefix_list_ids   = try(local. predefined_rules[each.value.rule_key].prefix_list_ids, [])
