@@ -6,7 +6,7 @@ resource "aws_instance" "this" {
 
   ami                         = var.ami
   instance_type               = var.instance_type
-  subnet_id              = var.subnet_id != null ? var.subnet_id : data.aws_subnet.default.id
+  subnet_id = var.subnet_id != null ? var.subnet_id : data.aws_subnets.default.ids[0]
   vpc_security_group_ids = length(var.security_group_ids) > 0 ? var.security_group_ids : [data.aws_security_group.default.id]
   key_name                    = var.create_key_pair ? aws_key_pair.this[0].key_name : var.key_name
   monitoring                  = var.monitoring
