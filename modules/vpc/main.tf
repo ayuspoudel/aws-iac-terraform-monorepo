@@ -40,17 +40,6 @@ resource "aws_subnet" "private" {
   })
 }
 
-# Elastic IPs for NAT Gateways
-resource "aws_eip" "nat" {
-  count = var.enable_nat_gateway ? (var.nat_gateway_per_az ? length(var.availability_zones) : 1) : 0
-
-  domain = "vpc"   # fixed deprecated 'vpc' argument
-
-  tags = merge(local.merged_tags, {
-    Name = var.nat_gateway_per_az ? format("%s-nat-gateway-%d-eip", var.project_name, count.index) : format("%s-nat-gateway-eip", var.project_name)
-  })
-}
-
 # NAT Gateways
 resource "aws_nat_gateway" "this" {
   count         = var.enable_nat_gateway ? (var.nat_gateway_per_az ? length(var.availability_zones) : 1) : 0
@@ -59,6 +48,18 @@ resource "aws_nat_gateway" "this" {
 
   tags = merge(local.merged_tags, {
     Name = var.nat_gateway_per_az ? format("%s-nat-gateway-%d", var.project_name, count.index) : "${var.project_name}-nat-gateway"
+  })
+}
+
+# Elastic IPs for NAT Gateways
+# If enable_nat_gateway is true it checks if nat_gateway_per_az is true, if yes creates as many as given availibility zone
+resource "aws_eip" "nat" {
+  count = var.enable_nat_gateway ? (var.nat_gateway_per_az ? length(var.availability_zones) : 1) : 0
+
+  domain = "vpc"   # fixed deprecated 'vpc' argument
+
+  tags = merge(local.merged_tags, {
+    Name = var.nat_gateway_per_az ? format("%s-nat-gateway-%d-eip", var.project_name, count.index) : format("%s-nat-gateway-eip", var.project_name)
   })
 }
 
@@ -114,10 +115,17 @@ resource "aws_vpn_gateway" "this" {
   })
 }
 
+# Transit Gateway (optional)
+resource "aws_ec2_transit_gateway" "this" {
+  count       = var.create_transit_gateway ? 1 : 0
+  description = "${var.project_name} Transit Gateway"
+  tags        = merge(local.merged_tags, { Name = "${var.project_name}-tgw" })
+}
+
 # Transit Gateway Attachment (optional)
 resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   count              = var.enable_transit_gateway ? 1 : 0
-  transit_gateway_id = var.transit_gateway_id
+  transit_gateway_id = aws_ec2_transit_gateway.this.id
   vpc_id             = aws_vpc.this.id
   subnet_ids         = aws_subnet.private[*].id
 
@@ -125,3 +133,5 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
     Name = local.transit_gateway_attachment_name
   })
 }
+
+

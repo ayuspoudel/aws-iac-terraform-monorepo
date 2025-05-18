@@ -41,30 +41,73 @@ This Terraform module creates a fully featured AWS VPC with flexible, production
 
 ### Example Usage
 
+1. **Add the module**: Include the module in your terraform configuration.
+
 ```bash
 module "vpc" {
-  source = "path/to/this/module"
-
-  project_name           = "myproject"
-  vpc_cidr               = "10.0.0.0/16"
-  availability_zones     = ["us-east-1a", "us-east-1b"]
-  public_subnet_cidrs    = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnet_cidrs   = ["10.0.101.0/24", "10.0.102.0/24"]
-
-  enable_nat_gateway     = true
-  nat_gateway_per_az     = true
-
-  enable_vpn_gateway     = false
+  source                = "path/to/modules/vpc"
+  project_name          = "my-app"
+  vpc_cidr              = "10.0.0.0/16"
+  availability_zones    = ["us-east-1a", "us-east-1b"]
+  public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
+  private_subnet_cidrs  = ["10.0.3.0/24", "10.0.4.0/24"]
+  enable_nat_gateway    = true
+  nat_gateway_per_az    = true
+  enable_vpn_gateway    = false
   enable_transit_gateway = false
-
-  hub_or_spoke           = "spoke"
-
+  create_transit_gateway = false
   tags = {
     Environment = "prod"
     Owner       = "team-network"
+    }
   }
-}
 ```
+
+2. **Deploy the infrastructure**
+
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+3. **Clean up the infrastructure**
+
+```bash
+terraform destroy
+```
+## Inputs
+
+| Variable                   | Description                                       | Type          | Default     |
+|---------------------------|---------------------------------------------------|---------------|-------------|
+| `project_name`            | Name for resource tagging/naming                 | `string`      | -           |
+| `vpc_cidr`                | VPC CIDR block                                   | `string`      | -           |
+| `availability_zones`      | List of AZs for subnets                          | `list(string)`| -           |
+| `public_subnet_cidrs`     | CIDRs for public subnets (one per AZ)            | `list(string)`| -           |
+| `private_subnet_cidrs`    | CIDRs for private subnets (one per AZ)           | `list(string)`| -           |
+| `enable_nat_gateway`      | Enable NAT Gateways                              | `bool`        | `true`      |
+| `nat_gateway_per_az`      | One NAT Gateway per AZ if true, else one         | `bool`        | `true`      |
+| `enable_vpn_gateway`      | Enable VPN Gateway                               | `bool`        | `false`     |
+| `vpn_customer_gateway_ips`| Customer Gateway IPs for VPN                     | `list(string)`| `[]`        |
+| `enable_transit_gateway`  | Attach to Transit Gateway                        | `bool`        | `false`     |
+| `create_transit_gateway`  | Create a new Transit Gateway                     | `bool`        | `false`     |
+| `transit_gateway_id`      | Existing Transit Gateway ID (if not creating)    | `string`      | `""`        |
+| `tags`                    | Custom tags for all resources                    | `map(string)` | `{}`        |
+| `extra_tags`              | Additional tags to merge                         | `map(string)` | `{}`        |
+
+---
+
+## Outputs
+
+| Output              | Description                              |
+|---------------------|------------------------------------------|
+| `vpc_id`            | ID of the created VPC                    |
+| `public_subnets`    | List of public subnet IDs                |
+| `private_subnets`   | List of private subnet IDs               |
+| `nat_gateway_ids`   | List of NAT Gateway IDs                  |
+| `vpn_gateway_id`    | VPN Gateway ID (if enabled)              |
+| `route_table_ids`   | IDs of public and private route tables   |
+
+
 
 # Dynamic Tagging & Naming
 
@@ -104,21 +147,6 @@ e.g. myproject-public-subnet-us-east-1a
 - Run terraform init and terraform apply.
 - Use output values to integrate with other modules (e.g., subnet IDs, route table IDs).
 
-#### Outputs
-
-```bash
-vpc_id — VPC resource ID
-
-public_subnets — List of public subnet IDs
-
-private_subnets — List of private subnet IDs
-
-nat_gateway_ids — List of NAT Gateway IDs
-
-vpn_gateway_id — VPN Gateway ID (if enabled)
-
-route_table_ids — Map of route tables per subnet type
-```
 ---
 
 Use this module to quickly bootstrap versatile VPC architectures while keeping everything consistent and manageable with clear naming and tagging standards.
