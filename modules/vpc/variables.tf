@@ -58,8 +58,13 @@ variable "nat_gateway_per_az" {
 variable "enable_vpn_gateway" {
   description = "Whether to create a VPN gateway"
   type        = bool
-  default     = false
+
+  validation {
+    condition     = var.enable_vpn_gateway ? length(var.vpn_customer_gateway_ips) > 0 : true
+    error_message = "You must provide at least one Customer Gateway IP if VPN Gateway is enabled."
+  }
 }
+
 
 variable "vpn_customer_gateway_ips" {
   description = "List of customer gateway IPs (for VPN tunnels)"

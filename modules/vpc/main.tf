@@ -125,7 +125,7 @@ resource "aws_ec2_transit_gateway" "this" {
 # Transit Gateway Attachment (optional)
 resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   count              = var.enable_transit_gateway ? 1 : 0
-  transit_gateway_id = aws_ec2_transit_gateway.this.id
+  transit_gateway_id = var.create_transit_gateway ? aws_ec2_transit_gateway.this[0].id : var.transit_gateway_id
   vpc_id             = aws_vpc.this.id
   subnet_ids         = aws_subnet.private[*].id
 
