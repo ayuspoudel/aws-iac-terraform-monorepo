@@ -85,7 +85,7 @@ EOT
   }))
   validation {
     condition = alltrue([
-      for r in var.ingress_rules :
+      for r in var.egress_rules :
       can(r.rule_key) || (can(r.from_port) && can(r.to_port) && can(r.protocol))
     ])
     error_message = "Each rule must have either a rule_key or from_port/to_port/protocol."
