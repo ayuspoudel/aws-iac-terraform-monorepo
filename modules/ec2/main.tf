@@ -25,8 +25,8 @@ resource "aws_instance" "this" {
 
   # Lifecycle rules for instance replacement and protection
   lifecycle {
-    create_before_destroy = var.instance_lifecycle_opts.create_before_destroy
-    prevent_destroy       = var.instance_lifecycle_opts.prevent_destroy
+    create_before_destroy = true
+    prevent_destroy       = false
   }
 
   tags = merge(local.default_tags, var.tags)
@@ -132,8 +132,8 @@ resource "aws_spot_instance_request" "this" {
   instance_interruption_behavior = var.spot_config.interruption_behavior
 
   lifecycle {
-    create_before_destroy = var.instance_lifecycle_opts.create_before_destroy
-    prevent_destroy       = var.instance_lifecycle_opts.prevent_destroy
+    create_before_destroy = true
+    prevent_destroy       = false
   }
 
   tags = merge(local.default_tags, var.tags)
