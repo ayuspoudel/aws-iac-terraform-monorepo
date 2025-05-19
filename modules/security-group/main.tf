@@ -35,8 +35,8 @@ resource "aws_security_group_rule" "ingress" {
 
 
 
-resource "aws_security_group_rule" "ingress" {
-  for_each = local.expanded_ingress_rules
+resource "aws_security_group_rule" "engress" {
+  for_each = local.expanded_egress_rules
 
   type              = "ingress"
   from_port         = each.value.from_port
