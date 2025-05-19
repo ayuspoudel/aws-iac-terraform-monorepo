@@ -1,29 +1,29 @@
-output "security_group_id" {
-  description = "ID of the security group created"
-  value       = var.enabled && var.create_security_group ? aws_security_group.this[0].id : null
+output "security_group_arn" {
+  description = "The ARN of the security group"
+  value       = try(aws_security_group.this[0].arn, aws_security_group.this_name_prefix[0].arn, "")
 }
 
-output "security_group_arn" {
-  description = "ARN of the security group created"
-  value       = var.enabled && var.create_security_group ? aws_security_group.this[0].arn : null
+output "security_group_id" {
+  description = "The ID of the security group"
+  value       = try(aws_security_group.this[0].id, aws_security_group.this_name_prefix[0].id, "")
+}
+
+output "security_group_vpc_id" {
+  description = "The VPC ID"
+  value       = try(aws_security_group.this[0].vpc_id, aws_security_group.this_name_prefix[0].vpc_id, "")
+}
+
+output "security_group_owner_id" {
+  description = "The owner ID"
+  value       = try(aws_security_group.this[0].owner_id, aws_security_group.this_name_prefix[0].owner_id, "")
 }
 
 output "security_group_name" {
-  description = "Name of the security group created or referenced"
-  value       = var.name
+  description = "The name of the security group"
+  value       = try(aws_security_group.this[0].name, aws_security_group.this_name_prefix[0].name, "")
 }
 
-output "ingress_rule_count" {
-  description = "Number of ingress rules applied"
-  value       = length(var.ingress_rules)
-}
-
-output "egress_rule_count" {
-  description = "Number of egress rules applied"
-  value       = length(var.egress_rules)
-}
-
-output "tags" {
-  description = "Tags applied to the security group"
-  value       = var.tags
+output "security_group_description" {
+  description = "The description of the security group"
+  value       = try(aws_security_group.this[0].description, aws_security_group.this_name_prefix[0].description, "")
 }

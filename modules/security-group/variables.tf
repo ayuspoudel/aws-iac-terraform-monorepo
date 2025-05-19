@@ -44,50 +44,14 @@ variable "default_cidr_blocks" {
   default     = ["0.0.0.0/0"]
 }
 
-variable "ingress_rules" {
-  description = <<EOT
-List of ingress rules to create.
-Each rule can use:
-- direct ports/protocols
-- or reference a predefined rule using `rule_key`
-EOT
-
-  type = list(object({
-    rule_key         = optional(string) # Reference to local.predefined_ingress_rules["key"]
-    from_port        = optional(number)
-    to_port          = optional(number)
-    protocol         = optional(string)
-    description      = string
-    cidr_blocks      = optional(list(string))
-    ipv6_cidr_blocks = optional(list(string))
-    prefix_list_ids  = optional(list(string))
-  }))
-  default = []
+variable "ingress_rule_keys" {
+  type        = list(string)
+  default     = []
+  description = "List of keys from predefined_rules to automatically expand into ingress rules."
 }
 
-variable "egress_rules" {
-  description = <<EOT
-List of egress rules to create.
-Each rule can use:
-- direct ports/protocols
-- or reference a predefined rule using `rule_key`
-EOT
-
-  type = list(object({
-    rule_key         = optional(string) # Reference to local.predefined_ingress_rules["key"]
-    from_port        = optional(number)
-    to_port          = optional(number)
-    protocol         = optional(string)
-    description      = string
-    cidr_blocks      = optional(list(string))
-    ipv6_cidr_blocks = optional(list(string))
-    prefix_list_ids  = optional(list(string))
-  }))
-  validation {
-    condition = alltrue([
-      for r in var.egress_rules :
-      can(r.rule_key) || (can(r.from_port) && can(r.to_port) && can(r.protocol))
-    ])
-    error_message = "Each rule must have either a rule_key or from_port/to_port/protocol."
-  }
+variable "egress_rule_keys" {
+  type        = list(string)
+  default     = []
+  description = "List of keys from predefined_rules to automatically expand into ingress rules."
 }

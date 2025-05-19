@@ -1,6 +1,42 @@
 locals {
   this_sg_id = var.enabled && var.create_security_group ? aws_security_group.this[0].id : var.name
 }
+
+locals {
+  expanded_ingress_rules = merge(
+    {
+      for key in var.ingress_rule_keys : key => merge(
+        local.predefined_rules[key],
+        {
+          rule_key    = key
+          cidr_blocks = var.default_cidr_blocks
+        }
+      )
+    },
+    {
+      for idx, rule in var.ingress_rules :
+      "custom-ingress-${idx}" => rule
+    }
+  )
+
+  expanded_egress_rules = merge(
+    {
+      for key in var.egress_rule_keys : key => merge(
+        local.predefined_rules[key],
+        {
+          rule_key    = key
+          cidr_blocks = var.default_cidr_blocks
+        }
+      )
+    },
+    {
+      for idx, rule in var.egress_rules :
+      "custom-egress-${idx}" => rule
+    }
+  )
+}
+
+
 locals {
    predefined_rules = {
      # All-Allow Rule (IPv4)
