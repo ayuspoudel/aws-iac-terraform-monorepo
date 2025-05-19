@@ -38,20 +38,81 @@ variable "tags" {
   default     = {}
 }
 
+variable "ingress_rule_keys" {
+  description = "List of predefined ingress rule keys (e.g., ['http', 'ssh'])"
+  type        = list(string)
+  default     = []
+}
+
+variable "egress_rule_keys" {
+  description = "List of predefined egress rule keys (e.g., ['all-allow'])"
+  type        = list(string)
+  default     = []
+}
 variable "default_cidr_blocks" {
   description = "Default CIDR blocks to use for rules (fallback)"
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
 
-variable "ingress_rule_keys" {
-  type        = list(string)
-  default     = []
-  description = "List of keys from predefined_rules to automatically expand into ingress rules."
+variable "ingress_rules" {
+  description = <<EOT
+List of ingress rules to create.
+Each rule can:
+- Use `rule_key` to reference a predefined rule
+- Or directly define `from_port`, `to_port`, and `protocol`
+EOT
+
+  type = list(object({
+    rule_key         = optional(string)
+    from_port        = optional(number)
+    to_port          = optional(number)
+    protocol         = optional(string)
+    description      = optional(string)
+    cidr_blocks      = optional(list(string))
+    ipv6_cidr_blocks = optional(list(string))
+    prefix_list_ids  = optional(list(string))
+    self             = optional(bool)
+  }))
+
+  default = []
+
+  validation {
+    condition = alltrue([
+      for r in var.ingress_rules :
+      can(r.rule_key) || (can(r.from_port) && can(r.to_port) && can(r.protocol))
+    ])
+    error_message = "Each ingress rule must include either a rule_key or from_port/to_port/protocol."
+  }
 }
 
-variable "egress_rule_keys" {
-  type        = list(string)
-  default     = []
-  description = "List of keys from predefined_rules to automatically expand into ingress rules."
+variable "egress_rules" {
+  description = <<EOT
+List of egress rules to create.
+Each rule can:
+- Use `rule_key` to reference a predefined rule
+- Or directly define `from_port`, `to_port`, and `protocol`
+EOT
+
+  type = list(object({
+    rule_key         = optional(string)
+    from_port        = optional(number)
+    to_port          = optional(number)
+    protocol         = optional(string)
+    description      = optional(string)
+    cidr_blocks      = optional(list(string))
+    ipv6_cidr_blocks = optional(list(string))
+    prefix_list_ids  = optional(list(string))
+    self             = optional(bool)
+  }))
+
+  default = []
+
+  validation {
+    condition = alltrue([
+      for r in var.egress_rules :
+      can(r.rule_key) || (can(r.from_port) && can(r.to_port) && can(r.protocol))
+    ])
+    error_message = "Each egress rule must include either a rule_key or from_port/to_port/protocol."
+  }
 }
