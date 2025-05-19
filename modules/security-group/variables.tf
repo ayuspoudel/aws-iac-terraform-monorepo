@@ -21,11 +21,19 @@ variable "description" {
   default     = "Managed by Terraform"
 }
 
+
+
 variable "vpc_id" {
-  description = "VPC ID where the security group will be created"
+  description = "VPC ID where the security group will be created. If not provided, the default VPC will be used."
   type        = string
+  default     = null
 }
 
+# Failover for VPC ID = null
+data "aws_vpc" "default" {
+  default = true
+  count   = var.vpc_id == null ? 1 : 0
+}
 variable "revoke_rules_on_delete" {
   description = "Revoke security group rules on delete"
   type        = bool
