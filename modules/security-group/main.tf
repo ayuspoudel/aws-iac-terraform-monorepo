@@ -6,13 +6,12 @@ resource "aws_security_group" "this" {
   revoke_rules_on_delete  = var.revoke_rules_on_delete
   tags                    = var.tags
 }
-resource "aws_security_group_rule" "ingress" {
+resource "aws_vpc_security_group_rule" "ingress" {
   for_each = local.expanded_ingress_rules
-
-  type              = "ingress"
+  type = "ingress"
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  protocol          = each.value.protocol
+  ip_protocol          = each.value.protocol
   description       = try(each.value.description, "")
   security_group_id = local.this_sg_id
 
