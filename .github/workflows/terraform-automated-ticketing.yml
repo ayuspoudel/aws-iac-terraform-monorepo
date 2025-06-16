@@ -1,9 +1,7 @@
 name: Terraform Apply
 
 on:
-  pull_request:
-    branches:
-      - master
+
   workflow_dispatch:
     inputs:
       target_resource:
