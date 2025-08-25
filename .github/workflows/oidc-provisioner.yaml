@@ -2,7 +2,7 @@ name: OIDC Provisioner
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     paths:
       - "oidc-github-repositories/**"
   workflow_dispatch:
