@@ -16,8 +16,10 @@ on:
           - s3
 
 jobs:
+  
   terraform_destroy:
     runs-on: ubuntu-latest
+    environment: infra-live
 
     steps:
       - name: Checkout code
