@@ -47,5 +47,5 @@ terraform.rc
 crash.log
 override.tf
 override.tf.json
-*.tfvars
+
 *.zip
