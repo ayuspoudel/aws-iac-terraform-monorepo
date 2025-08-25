@@ -8,5 +8,5 @@ inputs = {
     "arn:aws:iam::aws:policy/AWSLambda_FullAccess",
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess",
   ]
-} 
+}    
  
