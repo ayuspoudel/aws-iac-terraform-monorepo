@@ -1,0 +1,123 @@
+name: OIDC Provisioner
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "oidc-github-repositories/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      dirs: ${{ steps.detect.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Terragrunt
+        run: |
+          TG_VERSION=0.67.16
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64
+          sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
+          sudo chmod +x /usr/local/bin/terragrunt
+
+      - name: Detect changed Terragrunt dirs
+        id: detect
+        run: |
+          git log -m -1 --name-only --pretty="format:" ${{ github.sha }} > files
+          dirs=$(cat files | awk '{ sub("/[^/]*$", ""); print }' | uniq | grep '^oidc-github-repositories/' | grep -v -e '.terragrunt-cache' -e '.gitignore')
+          echo "dirs=$dirs" >> $GITHUB_OUTPUT
+
+      - name: Validate
+        if: steps.detect.outputs.dirs != ''
+        run: |
+          for TERRAGRUNT_PATH in ${{ steps.detect.outputs.dirs }}; do
+            cd $GITHUB_WORKSPACE/$TERRAGRUNT_PATH
+            terragrunt validate --terragrunt-non-interactive
+            cd $GITHUB_WORKSPACE
+          done
+
+  plan:
+    runs-on: ubuntu-latest
+    needs: validate
+    if: needs.validate.outputs.dirs != ''
+    outputs:
+      dirs: ${{ needs.validate.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Install Terragrunt
+        run: |
+          TG_VERSION=0.67.16
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64
+          sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
+          sudo chmod +x /usr/local/bin/terragrunt
+
+      - name: Plan
+        run: |
+          for TERRAGRUNT_PATH in ${{ needs.validate.outputs.dirs }}; do
+            cd $GITHUB_WORKSPACE/$TERRAGRUNT_PATH
+            terragrunt plan --terragrunt-non-interactive -out=tfplan
+            cd $GITHUB_WORKSPACE
+          done
+
+  apply:
+    runs-on: ubuntu-latest
+    environment: oidc-live
+    needs: plan
+    if: needs.plan.outputs.dirs != ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Install Terragrunt
+        run: |
+          TG_VERSION=0.67.16
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64
+          sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
+          sudo chmod +x /usr/local/bin/terragrunt
+
+      - name: Apply
+        run: |
+          for TERRAGRUNT_PATH in ${{ needs.plan.outputs.dirs }}; do
+            cd $GITHUB_WORKSPACE/$TERRAGRUNT_PATH
+            terragrunt apply --terragrunt-non-interactive -auto-approve
+            cd $GITHUB_WORKSPACE
+          done
+
+      - name: Export Terraform outputs
+        id: tfout
+        run: |
+          for TERRAGRUNT_PATH in ${{ needs.plan.outputs.dirs }}; do
+            cd $GITHUB_WORKSPACE/$TERRAGRUNT_PATH
+            arn=$(terragrunt output -raw repo_role_arn)
+            account=$(terragrunt output -raw aws_account_id)
+            echo "arn=$arn" >> $GITHUB_OUTPUT
+            echo "account=$account" >> $GITHUB_OUTPUT
+            cd $GITHUB_WORKSPACE
+          done
+
+      - name: Push role ARN to target repo secrets
+        run: |
+          repo=$(basename ${{ needs.plan.outputs.dirs }})
+          gh secret set AWS_ROLE_TO_ASSUME --body "${{ steps.tfout.outputs.arn }}" --repo "ayuspoudel/$repo"
+          gh secret set AWS_ACCOUNT_ID --body "${{ steps.tfout.outputs.account }}" --repo "ayuspoudel/$repo"
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT_TOKEN }}
