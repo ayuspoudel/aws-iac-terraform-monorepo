@@ -17,6 +17,8 @@ jobs:
       dirs: ${{ steps.detect.outputs.dirs }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
@@ -62,6 +64,8 @@ jobs:
       dirs: ${{ needs.validate.outputs.dirs }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configure AWS creds
         uses: aws-actions/configure-aws-credentials@v4
@@ -98,6 +102,8 @@ jobs:
     if: needs.plan.outputs.dirs != ''
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configure AWS creds
         uses: aws-actions/configure-aws-credentials@v4
