@@ -1,6 +1,6 @@
 inputs = {
   repo      = "ayuspoudel/tms"
-  role_name = "tms"
+  role_name = "github-oidc-tms-repo"
   policies = [ 
     # Amazon S3 full access
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
