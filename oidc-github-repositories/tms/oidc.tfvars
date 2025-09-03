@@ -5,7 +5,7 @@ inputs = {
     # Amazon S3 full access
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
 
-    # Amazon DynamoDB full access
+    # Amazon DynamoDB full access. 
     "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
 
     # IAM full access (for managing users, roles, and policies)
