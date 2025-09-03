@@ -18,18 +18,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-        
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-            terraform_version: 1.8.5   # or pin to the version you use locally
+          terraform_version: 1.8.5   # or pin to the version you use locally
     
       - name: Configure AWS creds
         uses: aws-actions/configure-aws-credentials@v4
         with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
       - name: Install Terragrunt
         run: |
           TG_VERSION=0.67.16
@@ -48,6 +48,7 @@ jobs:
         if: steps.detect.outputs.dirs != ''
         run: |
           for TERRAGRUNT_PATH in ${{ steps.detect.outputs.dirs }}; do
+            echo "Validating $TERRAGRUNT_PATH"
             cd $GITHUB_WORKSPACE/$TERRAGRUNT_PATH
             terragrunt validate --terragrunt-non-interactive
             cd $GITHUB_WORKSPACE
@@ -68,12 +69,11 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-    
-    
+
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-            terraform_version: 1.8.5   # or pin to the version you use locally
+          terraform_version: 1.8.5   # or pin to the version you use locally
 
       - name: Install Terragrunt
         run: |
@@ -85,6 +85,7 @@ jobs:
       - name: Plan
         run: |
           for TERRAGRUNT_PATH in ${{ needs.validate.outputs.dirs }}; do
+            echo "Running terragrunt plan in $TERRAGRUNT_PATH"
             cd $GITHUB_WORKSPACE/$TERRAGRUNT_PATH
             terragrunt plan --terragrunt-non-interactive -out=tfplan
             cd $GITHUB_WORKSPACE
@@ -104,10 +105,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
+
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-            terraform_version: 1.8.5   # or pin to the version you use locally
+          terraform_version: 1.8.5   # or pin to the version you use locally
+
       - name: Install Terragrunt
         run: |
           TG_VERSION=0.67.16
@@ -118,6 +121,7 @@ jobs:
       - name: Apply
         run: |
           for TERRAGRUNT_PATH in ${{ needs.plan.outputs.dirs }}; do
+            echo "Running terragrunt apply in $TERRAGRUNT_PATH"
             cd $GITHUB_WORKSPACE/$TERRAGRUNT_PATH
             terragrunt apply --terragrunt-non-interactive -auto-approve
             cd $GITHUB_WORKSPACE
