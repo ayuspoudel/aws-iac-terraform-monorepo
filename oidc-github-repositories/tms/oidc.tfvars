@@ -3,7 +3,7 @@ inputs = {
   role_name = "github-oidc-tms-repo"
   policies = [ 
     # Amazon S3 full access
-    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess",  
 
     # Amazon DynamoDB full access. 
     "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
