@@ -10,7 +10,6 @@ inputs = {
     "arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator",
     "arn:aws:iam::aws:policy/AmazonCognitoPowerUser",
     "arn:aws:iam::aws:policy/AmazonSQSFullAccess",
-    "arn:aws:iam::aws:policy/AmazonSNSFullAccess",
     "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
     "arn:aws:iam::aws:policy/AWSCloudFormationFullAccess",
   ]
